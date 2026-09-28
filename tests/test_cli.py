@@ -133,7 +133,7 @@ class ExitCodes(Isolated):
         os.chdir(self.tmp)
         self.addCleanup(os.chdir, here)
         code, rep = self.report("--project", "project")
-        self.assertEqual(rep["project"], str(self.project))
+        self.assertEqual(rep["project"], str(self.project.resolve()))  # macOS temp dirs sit behind the /var -> /private/var link
         with mock.patch("pathlib.Path.cwd", side_effect=FileNotFoundError):
             code, rep = self.report()
         self.assertEqual((code, rep["project"]), (0, None))
