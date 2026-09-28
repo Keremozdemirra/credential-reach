@@ -116,8 +116,9 @@ users:
     def test_kubeconfig_env_lists_files_with_the_platform_separator(self):
         a = self.write("a.yaml", "users:\n- name: a\n  user:\n    token: x\n")
         b = self.write("b.yaml", "users:\n- name: b\n  user:\n    password: y\n")
-        sec = self.scan(KUBECONFIG=f"{a}:{b}")
-        self.assertEqual({x["item"] for x in sec.findings}, {"user a", "user b"})
+        if os.name != "nt":  # a drive letter's colon would split a Windows path
+            sec = self.scan(KUBECONFIG=f"{a}:{b}")
+            self.assertEqual({x["item"] for x in sec.findings}, {"user a", "user b"})
         sec = cr.scan_kube(self.ctx(system="Windows", env={**os.environ, "KUBECONFIG": f"{a};{b}"}))
         self.assertEqual({x["item"] for x in sec.findings}, {"user a", "user b"})
 
@@ -493,7 +494,8 @@ class Ssh(Isolated):
         self.assertEqual(k["cut"]["detail"], "OpenSSH unknown type, passphrase status unknown")
         self.assertEqual(k["garbled"]["severity"], "medium")
 
-    @unittest.skipUnless(shutil.which("ssh-keygen"), "ssh-keygen not installed")
+    @unittest.skipUnless(shutil.which("ssh-keygen") and os.name != "nt",
+                         "ssh-keygen not installed, or Windows, where it exits 255 on the CI runner")
     def test_keys_made_by_ssh_keygen(self):
         d = self.home / ".ssh"
         d.mkdir()
