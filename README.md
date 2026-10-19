@@ -108,21 +108,20 @@ confirmation typed at a terminal.
 
 ### Command line
 
-Standard library only, Python 3.9 or newer. From PyPI, pinned to a release; "PyPI does not
-allow for a filename to be reused" ([PyPI help](https://pypi.org/help/#file-name-reuse),
-checked 2026-09-24), so the files of a published release cannot be replaced:
+Standard library only, Python 3.9 or newer. It is not on PyPI; install it from GitHub,
+pinned to the `v0.1.0` tag:
 
 ```bash
-uvx credential-reach@0.1.0                     # audit this machine and the current directory
-uvx credential-reach@0.1.0 --project ~/code/app --markdown
-pipx run --spec credential-reach==0.1.0 credential-reach --json
+uvx --from git+https://github.com/Keremozdemirra/credential-reach@v0.1.0 credential-reach   # audit this machine and the current directory
+uvx --from git+https://github.com/Keremozdemirra/credential-reach@v0.1.0 credential-reach --project ~/code/app --markdown
+pipx install git+https://github.com/Keremozdemirra/credential-reach@v0.1.0                   # then: credential-reach --json
+pip install git+https://github.com/Keremozdemirra/credential-reach@v0.1.0
 ```
 
-`uvx credential-reach` without a version installs the newest release the first time and
-reuses uv's cached copy after that; `uvx credential-reach@latest` refreshes it
-([uv tools](https://docs.astral.sh/uv/concepts/tools/), checked 2026-09-24).
+Drop `@v0.1.0` to get the newest commit on `main` instead. From a checkout:
+`git clone https://github.com/Keremozdemirra/credential-reach && cd credential-reach && python3 credential_reach.py`.
 
-Without installing anything: it is one file. Download the file of a tagged release, read it,
+Without installing anything: it is one file. Download the file at a tag, read it,
 then run it:
 
 ```bash

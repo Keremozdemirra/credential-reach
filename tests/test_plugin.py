@@ -61,7 +61,7 @@ class Packaging(unittest.TestCase):
 
     def test_readme_install_lines(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        for line in (f"uvx credential-reach@{cr.VERSION}", "/plugin marketplace add Keremozdemirra/credential-reach",
+        for line in (f"uvx --from git+https://github.com/Keremozdemirra/credential-reach@v{cr.VERSION} credential-reach", "/plugin marketplace add Keremozdemirra/credential-reach",
                      "/plugin install credential-reach@credential-reach",
                      f"https://raw.githubusercontent.com/Keremozdemirra/credential-reach/v{cr.VERSION}/credential_reach.py"):
             self.assertIn(line, readme)
@@ -74,7 +74,7 @@ class Packaging(unittest.TestCase):
             self.assertNotRegex(text, r"(?m)^\s*curl\b.*\|\s*python", rel)
             self.assertNotIn("/main/credential_reach.py", text, rel)
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        self.assertLess(readme.index(f"uvx credential-reach@{cr.VERSION}"), readme.index("curl -fsSLO"))
+        self.assertLess(readme.index(f"uvx --from git+https://github.com/Keremozdemirra/credential-reach@v{cr.VERSION} credential-reach"), readme.index("curl -fsSLO"))
 
 
 class Repository(unittest.TestCase):
