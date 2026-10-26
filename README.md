@@ -102,8 +102,8 @@ would send the fake tokens to api.github.com.
 
 That adds a skill, no hook. Ask "what can my agent reach?" or "audit my credentials
 before I let an agent run" and Claude runs the audit, reads the JSON (which holds no
-values) and explains it. The skill tells Claude not to open the files it lists, not to
-run `--probe` without your yes, and to leave `--redact` to you, since it needs a
+values) and explains it. The skill tells Claude to open none of the files it lists, to
+run `--probe` only after your yes, and to leave `--redact` to you, since it needs a
 confirmation typed at a terminal.
 
 ### Command line
@@ -156,7 +156,7 @@ is not a terminal, or a transcript could not be read or rewritten.
 
 ### Severity
 
-The levels are this tool's own classification, not a standard:
+The levels are this tool's own classification:
 
 - **high**: a credential sits where any process running as you can read it and use it as
   it is (a variable, a plain file, an unencrypted key, a transcript), or `--probe`
@@ -188,7 +188,7 @@ Environment variables of the process it runs in, and these files where they exis
 | gh | `hosts.yml` in `GH_CONFIG_DIR`, `$XDG_CONFIG_HOME/gh` or `~/.config/gh` | hosts, user, token in the file or in the system store |
 | SSH | `~/.ssh/*` except `*.pub`, `known_hosts`, `authorized_keys`, `config`; `UseKeychain` in `~/.ssh/config`; `SSH_AUTH_SOCK` | private key files: format, key type, passphrase yes/no, read from the unencrypted header (OpenSSH `PROTOCOL.key`, PEM `Proc-Type`, PKCS#8, PuTTY) without decrypting |
 | Terraform | `~/.terraform.d/credentials.tfrc.json`, `~/.terraformrc` (or `TF_CLI_CONFIG_FILE`) | hosts with a token; a `credentials_helper` |
-| Project | `.env`, `.env.*`, `*.env`, `.envrc` and secret-named files (`*.pem`, `*.key`, `id_rsa`, `*.tfstate`, `credentials.json`, `.npmrc`, ...) under `--project`, skipping `.git`, `node_modules` and virtual environments; a symbolic link to a file outside the project is reported, not read | variable names, which are credential-like with a value, and git status (`tracked`, `ignored`, `not ignored`) from `git ls-files` and `git check-ignore` |
+| Project | `.env`, `.env.*`, `*.env`, `.envrc` and secret-named files (`*.pem`, `*.key`, `id_rsa`, `*.tfstate`, `credentials.json`, `.npmrc`, ...) under `--project`, skipping `.git`, `node_modules` and virtual environments; a symbolic link to a file outside the project is reported without being read | variable names, which are credential-like with a value, and git status (`tracked`, `ignored`, `not ignored`) from `git ls-files` and `git check-ignore` |
 | Transcripts | `~/.claude/projects/**/*.jsonl` and set-aside `*.jsonl.superseded-*` (or under `CLAUDE_CONFIG_DIR`) | per file, the count of secret-shaped strings and of lines per type |
 
 Secret shapes in transcripts are the seven that `tests/test_plugin.py` keeps out of this
@@ -233,7 +233,7 @@ server. Using a token for this request is a use of it; GitHub may record it, for
 the token's last-used date.
 
 The request is made with urllib, verifies TLS against the system's default CA
-certificates, and never follows a redirect: a `3xx` answer is reported, not followed, so
+certificates, and never follows a redirect: it reports a `3xx` answer and stops, so
 the token reaches no other host and never travels over plain HTTP. If `HTTPS_PROXY` is set,
 the request goes through that proxy inside a TLS tunnel to api.github.com, and the report
 says so without printing the proxy's address. A proxy that terminates TLS and adds its own
